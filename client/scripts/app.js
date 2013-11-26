@@ -34,8 +34,8 @@ $(document).ready(function(){
           $(dataContainer).appendTo($messageContainer);
         }
         for (var j = 0; j < roomFilter.length; j++){
-          var roomNodes = $("<li />", {'text': roomFilter[j] });
-          roomNodes.appendTo('ul');
+          var roomNodes = $("<option />", {'text': roomFilter[j] });
+          roomNodes.appendTo('select');
         }
       },
       error: function (data) {
@@ -69,6 +69,7 @@ $(document).ready(function(){
   // Button ish.
 $('.refresh').click(function(){
     $messageContainer.html('');
+    $('select').html('');
     getMessages();
   });
 
@@ -93,5 +94,12 @@ $('.refresh').click(function(){
     }
   });
 
+/* TODO --
+* add eventlisteners to the chatroom dropdown that will call a function that will filter the chat results.
+* for friends just addClass() and that other shit.
+* ask Linzay how she did her filtering process.
+
+
+*/
 
 });
