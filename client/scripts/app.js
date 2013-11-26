@@ -21,15 +21,21 @@ $(document).ready(function(){
       type: 'GET',
       contentType: 'application/json',
       success: function(data){
+        var roomFilter = [];
         for (var i = 0; i < data.results.length; i++) {
           var message = data.results[i];
           var rooms = data.results[i].roomname;
-          var uniqueRooms = $("<li />", {'text':_.unique(rooms) });
+          if(roomFilter.indexOf(rooms) === -1){
+            roomFilter.push(rooms);
+          }
           console.log(rooms);
           var dataContainer = $("<div />", {'text': message.username + ': ' + message.text});
           //console.log(dataContainer);
           $(dataContainer).appendTo($messageContainer);
-          uniqueRooms.appendTo('ul');
+        }
+        for (var j = 0; j < roomFilter.length; j++){
+          var roomNodes = $("<li />", {'text': roomFilter[j] });
+          roomNodes.appendTo('ul');
         }
       },
       error: function (data) {
