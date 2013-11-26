@@ -24,7 +24,7 @@ $(document).ready(function(){
       success: function(data){
         var roomFilter = [];
         for (var i = 0; i < data.results.length; i++) {
-            message = data.results[i];
+          message = data.results[i];
           if(data.results[i].text.length > 100) {
             message.text = "I suck";
             console.log(data.results[i]);
@@ -33,8 +33,7 @@ $(document).ready(function(){
           if(roomFilter.indexOf(rooms) === -1){
             roomFilter.push(rooms);
           }
-          
-          var dataContainer = $("<div />", {'text': message.username + ': ' + message.text, 'class': 'messageClass ' + message.roomname});
+          var dataContainer = $("<div />", {'text': message.username + ': ' + message.text, 'class': 'messageClass ' + message.roomname + ' ' + message.username, 'username':message.username});
           console.log(data);
           $(dataContainer).appendTo($messageContainer);
         }
@@ -48,12 +47,12 @@ $(document).ready(function(){
         console.error('chatterbox: Failed to get message');
       }
     });
-  };
+};
 
-  getMessages();
+getMessages();
 
-  var postMessages = function(message){
-    $.ajax({
+var postMessages = function(message){
+  $.ajax({
       // always use this url
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'POST',
@@ -68,11 +67,11 @@ $(document).ready(function(){
         console.error('chatterbox: Failed to send message');
       }
     });
-  };
+};
 
 
   // Button ish.
-$('.refresh').click(function(){
+  $('.refresh').click(function(){
     $messageContainer.html('');
     $('select').html('');
     getMessages();
@@ -106,6 +105,14 @@ $('.refresh').click(function(){
     });
     $('.messageClass').show();
     $('.messageClass').not( '.' + roomSelection).hide();
+  });
+
+
+  $('body').on('click', '.messageClass',function(){
+    var userSelection = $(this).attr('username');
+    console.log(userSelection);
+    $('.' + userSelection).toggleClass('bold');
+
   });
 
 /* TODO --
