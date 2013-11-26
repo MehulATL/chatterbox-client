@@ -7,6 +7,7 @@ $(document).ready(function(){
   var username = window.location.search.slice(10);
   //console.log(username);
   //console.log(messageValue);
+  var message;
 
   //var room = prompt("What room would you like to enter?");
 
@@ -23,14 +24,18 @@ $(document).ready(function(){
       success: function(data){
         var roomFilter = [];
         for (var i = 0; i < data.results.length; i++) {
-          var message = data.results[i];
+            message = data.results[i];
+          if(data.results[i].text.length > 100) {
+            message.text = "I suck";
+            console.log(data.results[i]);
+          }
           var rooms = data.results[i].roomname;
           if(roomFilter.indexOf(rooms) === -1){
             roomFilter.push(rooms);
           }
-          console.log(rooms);
-          var dataContainer = $("<div />", {'text': message.username + ': ' + message.text});
-          //console.log(dataContainer);
+          
+          var dataContainer = $("<div />", {'text': message.username + ': ' + message.text, 'class': 'messageClass ' + message.roomname});
+          console.log(data);
           $(dataContainer).appendTo($messageContainer);
         }
         for (var j = 0; j < roomFilter.length; j++){
@@ -92,6 +97,15 @@ $('.refresh').click(function(){
     if(e.keyCode === 13){
       $('.send').click();
     }
+  });
+
+  $('select').change(function(){
+    var roomSelection = '';
+    $('select option:selected').each(function(){
+      roomSelection += $(this).text();
+    });
+    $('.messageClass').show();
+    $('.messageClass').not( '.' + roomSelection).hide();
   });
 
 /* TODO --
