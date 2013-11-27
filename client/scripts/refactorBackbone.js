@@ -1,59 +1,4 @@
 // YOUR CODE HERE:
-var Messages = function(){};
-Messages.prototype.add = function (options){
-  $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox?order=-createdAt&limit=25',
-    type: 'GET',
-    contentType: 'application/json',
-    success: options.success,
-    error: function (data) {
-      console.error('chatterbox: Failed to get message');
-    }
-  });
-};
-
-var NewMessageView = function(options){
-  var messages = options.messages;
-
-  $('.send').on('click', function(){
-    userMessage.text = $textbox.val();
-    postMessages(userMessage);
-    $textbox.val('');
-    $('.refresh').click();
-
-
-
-    messages.add({
-      success: function(data){
-        var roomFilter = [];
-      // loop through our data to separate messages.
-        for (var i = 0; i < data.results.length; i++) {
-          message = data.results[i];
-          // putting a limit on message length
-          if(data.results[i].text.length > 100) {
-            message.text = "I suck";
-            console.log(data.results[i]);
-          }
-          // making a list of all unique chatrooms
-          var rooms = data.results[i].roomname;
-          if(roomFilter.indexOf(rooms) === -1){
-           roomFilter.push(rooms);
-          }
-          // constructing and appending our message dom nodes
-          var dataContainer = $("<div />", {'text': message.username + ': ' + message.text, 'class': 'messageClass ' + message.roomname + ' ' + message.username, 'username':message.username});
-          console.log(data);
-          $(dataContainer).appendTo($messageContainer);
-        }
-        // creating and appending our chatroom nodes to the dropdown menu
-        for (var j = 0; j < roomFilter.length; j++){
-          var roomNodes = $("<option />", {'text': roomFilter[j] });
-          roomNodes.appendTo('select');
-        }
-      };
-    });
-  });
-});
-
 $(document).ready(function(){
 
   // our variable declarations
@@ -62,28 +7,60 @@ $(document).ready(function(){
   var username = window.location.search.slice(10);
   var message;
 
-  // backbone method initialization
-  var messages = new Messages();
-  new NewMessageView({messages: messages});
-
-
-
-  getMessages();
-
-  var postMessages = function(message){
+  // AJAX ISH
+  var getMessages = function(){
     $.ajax({
-      url: 'https://api.parse.com/1/classes/chatterbox',
-      type: 'POST',
-      data: JSON.stringify(message),
+      url: 'https://api.parse.com/1/classes/chatterbox?order=-createdAt&limit=25',
+      type: 'GET',
       contentType: 'application/json',
-      success: function (data) {
-        console.log('chatterbox: Message sent');
-      },
-      error: function (data) {
-        console.error('chatterbox: Failed to send message');
+      success: function(data){
+        var roomFilter = [];
+      // loop through our data to separate messages.
+      for (var i = 0; i < data.results.length; i++) {
+        message = data.results[i];
+        // putting a limit on message length
+        // if(data.results[i].text.length > 100) {
+        //   message.text = "I suck";
+        //   console.log(data.results[i]);
+        // }
+        // making a list of all unique chatrooms
+        var rooms = data.results[i].roomname;
+        if(roomFilter.indexOf(rooms) === -1){
+          roomFilter.push(rooms);
+        }
+        // constructing and appending our message dom nodes
+        var dataContainer = $("<div />", {'text': message.username + ': ' + message.text, 'class': 'messageClass ' + message.roomname + ' ' + message.username, 'username':message.username});
+        console.log(data);
+        $(dataContainer).appendTo($messageContainer);
       }
-    });
-  };
+      // creating and appending our chatroom nodes to the dropdown menu
+      for (var j = 0; j < roomFilter.length; j++){
+        var roomNodes = $("<option />", {'text': roomFilter[j] });
+        roomNodes.appendTo('select');
+      }
+    },
+    error: function (data) {
+      console.error('chatterbox: Failed to get message');
+    }
+  });
+};
+
+getMessages();
+
+var postMessages = function(message){
+  $.ajax({
+    url: 'https://api.parse.com/1/classes/chatterbox',
+    type: 'POST',
+    data: JSON.stringify(message),
+    contentType: 'application/json',
+    success: function (data) {
+      console.log('chatterbox: Message sent');
+    },
+    error: function (data) {
+      console.error('chatterbox: Failed to send message');
+    }
+  });
+};
 
 
   // show new messages
@@ -101,13 +78,18 @@ $(document).ready(function(){
   };
 
   // send message function
+  $('.send').on('click', function(){
+    userMessage.text = $textbox.val();
+    postMessages(userMessage);
+    $textbox.val('');
+    $('.refresh').click();
+  });
 
-
-  // $textbox.keyup(function(e){
-  //   if(e.keyCode === 13){
-  //     $('.send').click();
-  //   }
-  // });
+  $textbox.keyup(function(e){
+    if(e.keyCode === 13){
+      $('.send').click();
+    }
+  });
 
   // chat room selection function
   $('select').change(function(){
